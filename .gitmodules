@@ -1,0 +1,3 @@
+[submodule "contrib/diagram-tools"]
+	path = contrib/diagram-tools
+	url = https://github.com/vidarh/diagram-tools.git
