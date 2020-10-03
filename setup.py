@@ -11,5 +11,8 @@ setup(name='dotmagic',
         package_data={
             'dotmagic': [ '*.xsl' ]
         },
+        install_requires = [
+            "ipython"
+        ],
         include_package_data=True,
      )

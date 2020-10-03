@@ -5,7 +5,7 @@ from subprocess import Popen, PIPE
 import string
 import tempfile
 from pkg_resources import resource_filename
-from IPython.core.display import display_svg, display_png
+from IPython.display import SVG, Image
 from IPython.core.magic import (
     Magics, magics_class,
     line_magic, line_cell_magic
@@ -44,7 +44,7 @@ class DotMagics(Magics):
 
     def __init__(self, shell=None, **kwargs):
         super().__init__(shell, **kwargs)
-        self._opts = 'psK:'
+        self._opts = 'prsK:'
         self._tmpdir = tempfile.mkdtemp()
 
 
@@ -61,8 +61,8 @@ class DotMagics(Magics):
         return source.pipe(cmd)
 
     def _svg_to_png(self, s):
-        _, tmpf = tempfile.mkstemp(dir=self._tmpdir, suffix='png')
-        cmd = ['inkscape', '/dev/stdin', '-e', tmpf]
+        _, tmpf = tempfile.mkstemp(dir=self._tmpdir, suffix='.png')
+        cmd = ['inkscape', '-p', '-o', tmpf]
         return s.pipe(cmd, outfile=tmpf)
 
     def _do_args(self, line):
@@ -76,31 +76,34 @@ class DotMagics(Magics):
         if cell:
             s = '\n' + cell
 
-        display = display_svg
+        image_type = SVG
 
         s = string.Template(s)
         s = s.safe_substitute(self.shell.user_ns)
 
         cmd = self._run_graphviz(s, layout=layout)
-        
+
         if 's' in opts:
             cmd = self._drop_shadow(cmd)
 
         if 'p' in opts:
             cmd = self._svg_to_png(cmd)
-            display = display_png
+            image_type = Image
+
+        if 'r' in opts:
+            return cmd.read()
 
         out = cmd.read()
-        display(out, raw=True)
+        return image_type(out)
 
 
     @line_cell_magic
     def dot(self, line, cell=None):
         opts, line = self._do_args(line)
-        self._do_magic(opts, line, cell)
+        return self._do_magic(opts, line, cell)
 
     @line_magic
     def dotstr(self, line):
         opts, line = self._do_args(line)
         line = self.shell.ev(line)
-        self._do_magic(opts, line)
+        return self._do_magic(opts, line)
