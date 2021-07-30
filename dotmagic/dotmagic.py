@@ -4,6 +4,7 @@
 from subprocess import Popen, PIPE
 import string
 import tempfile
+from shutil import which
 from pkg_resources import resource_filename
 from IPython.display import SVG, Image
 from IPython.core.magic import (
@@ -46,6 +47,7 @@ class DotMagics(Magics):
         super().__init__(shell, **kwargs)
         self._opts = 'prsK:'
         self._tmpdir = tempfile.mkdtemp()
+        self._inkscape = which("inkscape")
 
 
     def _run_graphviz(self, s, output='svg', layout='dot'):
@@ -87,8 +89,12 @@ class DotMagics(Magics):
             cmd = self._drop_shadow(cmd)
 
         if 'p' in opts:
-            cmd = self._svg_to_png(cmd)
-            image_type = Image
+            if self._inkscape is not None:
+                cmd = self._svg_to_png(cmd)
+                image_type = Image
+            else:
+                print("`inkscape` not found")
+                print("Falling back to PNG rendering") 
 
         if 'r' in opts:
             return cmd.read()
