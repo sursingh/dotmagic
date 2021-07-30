@@ -7,16 +7,21 @@ Simple magic functions that adds support for dropping shadows in diagram
 
 pip install git+https://github.com/sursingh/dotmagic.git
 
+This has a dependency on [inkscape](https://inkscape.org/). `inkscape`
+needs to be installed for supporting rendering to `png`. SVG rendering should
+work out of the box.
+
 ## Usage
 
 ```
-%%dot -psK <layout>
+%%dot -prsK <layout>
  -p: convert image to png (default SVG)
+ -r: return raw svg file
  -s: drop shadows
  -K <layout>: Select the layout
     dot(default), neato, twopi, circle, fdpm sfdp
 
-%dotstr -psK <layout> <dotstr>
+%dotstr -prsK <layout> <dotstr>
 
 ```
 
@@ -35,7 +40,7 @@ color='lightblue'
 
 
 ```python
-%%dot -p
+%%dot
 digraph {
     node [color="${color}" style="${style}"]
     a -> {b c}
@@ -52,7 +57,7 @@ g = '''digraph {
    node [color="${color}" style="${style}"]
     a -> {b c} 
 }'''
-%dotstr -p g
+%dotstr g
 ```
 
 
@@ -63,7 +68,7 @@ g = '''digraph {
 
 
 ```python
-%%dot -sp
+%%dot -s
 digraph {
     node [color="${color}" style="${style}"]
     a -> {b c}
@@ -78,7 +83,7 @@ digraph {
 
 
 ```python
-%%dot -spK neato
+%%dot -sK neato
 digraph {
     node [color="${color}" style="${style}"]
     a -> {b c}
